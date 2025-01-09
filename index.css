@@ -1,0 +1,53 @@
+img {
+    border-radius: 50%;
+    /* border-color: aliceblue; */
+    border:5px solid aliceblue;
+  }
+  
+body{
+    background-color:rgba(244, 242, 242, 0.785);
+}
+
+h1{
+    color: rgb(255, 255, 255);
+}
+
+#bullets1{
+    color: rgb(188, 165, 19);
+}
+
+a:link, a:visited{
+    color: #ffffff;
+}
+/* a:visited{
+    color: blueviolet;
+} */
+a:hover, a:active{
+    color: teal;
+}
+a.one:visited{
+    color: rgb(15, 115, 113);
+}
+
+#git{
+    color: rgb(12, 4, 4);
+}
+
+#linkedin{
+    color: rgb(12, 4, 4);
+}
+
+#envelope{
+    color: rgb(12, 4, 4);
+}
+
+/* construction {
+    margin-top:100px;
+    margin-bottom:5px
+ } */
+
+ mark{
+    background-color: black;
+    color: wheat;
+ }
+ 
