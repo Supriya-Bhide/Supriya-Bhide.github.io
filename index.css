@@ -75,3 +75,10 @@ mark {
     margin-right: auto;
     /* Automatically centers horizontally */
 }
+
+@media (max-width: 768px) {
+    #about {
+        max-width: 90%;
+        /* For smaller screens, use 90% of the screen width */
+    }
+}
