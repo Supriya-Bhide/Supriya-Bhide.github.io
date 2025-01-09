@@ -67,8 +67,11 @@ mark {
     padding-right: 2%;
     margin-top: 2%;
     margin-bottom: 2%;
-    margin-left: 30%;
-    margin-right: 30%;
     background-color: rgb(243, 238, 234);
     color: black;
+    max-width: 30%;
+    /* Max width ensures it's responsive */
+    margin-left: auto;
+    margin-right: auto;
+    /* Automatically centers horizontally */
 }
