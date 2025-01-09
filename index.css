@@ -1,43 +1,52 @@
+@font-face {
+    font-family: "CanvaSans";
+    src: url("./usr/share/fonts/OnlineWebFonts_COM_5f2c1fb3cc2f6e9776878fef70759e96/Centra No1 TRIAL/usr/share/fonts/OnlineWebFonts_COM_5f2c1fb3cc2f6e9776878fef70759e96/Centra No1 TRIAL.ttf");
+}
+
 img {
     border-radius: 50%;
     /* border-color: aliceblue; */
-    border:5px solid aliceblue;
-  }
-  
-body{
-    background-color:rgba(244, 242, 242, 0.785);
+    border: 5px solid aliceblue;
 }
 
-h1{
+body {
+    background-color: rgba(244, 242, 242, 0.785);
+}
+
+h1 {
     color: rgb(255, 255, 255);
 }
 
-#bullets1{
+#bullets1 {
     color: rgb(188, 165, 19);
 }
 
-a:link, a:visited{
+a:link,
+a:visited {
     color: #ffffff;
 }
+
 /* a:visited{
     color: blueviolet;
 } */
-a:hover, a:active{
+a:hover,
+a:active {
     color: teal;
 }
-a.one:visited{
+
+a.one:visited {
     color: rgb(15, 115, 113);
 }
 
-#git{
+#git {
     color: rgb(12, 4, 4);
 }
 
-#linkedin{
+#linkedin {
     color: rgb(12, 4, 4);
 }
 
-#envelope{
+#envelope {
     color: rgb(12, 4, 4);
 }
 
@@ -46,8 +55,20 @@ a.one:visited{
     margin-bottom:5px
  } */
 
- mark{
+mark {
     background-color: black;
     color: wheat;
- }
- 
+}
+
+#about {
+    font-family: "CanvaSans", sans-serif;
+    text-align: justify;
+    padding-left: 2%;
+    padding-right: 2%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 600;
+    margin-right: 600px;
+    background-color: rgb(243, 238, 234);
+    color: black;
+}
