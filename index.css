@@ -7,7 +7,6 @@ img {
     border-radius: 50%;
     /* border-color: aliceblue; */
     border: 10px solid aliceblue;
-    draggable: "false";
     -webkit-user-drag: none;
     user-select: none;
     -moz-user-select: none;
