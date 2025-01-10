@@ -7,6 +7,12 @@ img {
     border-radius: 50%;
     /* border-color: aliceblue; */
     border: 10px solid aliceblue;
+    draggable: "false";
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }
 
 body {
@@ -83,10 +89,10 @@ mark {
         /* For smaller screens, use 90% of the screen width */
     }
 
-    #about {
-        max-width: 100%;
-        /* For smaller screens, use 90% of the screen width */
-    }
+    /* #about { */
+    /* max-width: 100%; */
+    /* For smaller screens, use 90% of the screen width */
+    /* } */
 }
 
 #main-body {
@@ -96,7 +102,7 @@ mark {
     margin-top: 2%;
     margin-bottom: 2%;
     background-color: white;
-    max-width: 90%;
+    max-width: 60%;
     /* Max width ensures it's responsive */
     margin-left: auto;
     margin-right: auto;
