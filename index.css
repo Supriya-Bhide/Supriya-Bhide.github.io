@@ -78,12 +78,12 @@ mark {
 }
 
 @media (max-width: 768px) {
-    #about {
+    #main-body {
         max-width: 90%;
         /* For smaller screens, use 90% of the screen width */
     }
 
-    #main-body {
+    #about {
         max-width: 90%;
         /* For smaller screens, use 90% of the screen width */
     }
