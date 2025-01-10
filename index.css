@@ -62,17 +62,18 @@ mark {
 #about {
     font-family: "CanvaSans", sans-serif;
     text-align: justify;
+    border-radius: 25px;
     padding-left: 2%;
     padding-right: 2%;
+    padding-bottom: 1%;
     margin-top: 2%;
     margin-bottom: 2%;
     background-color: rgb(243, 238, 234);
     color: black;
-    max-width: 100%;
+    /* max-width: 100%; */
     /* Max width ensures it's responsive */
     margin-left: auto;
     margin-right: auto;
-    border-radius: 5%;
     /* Automatically centers horizontally */
 }
 
@@ -81,10 +82,15 @@ mark {
         max-width: 90%;
         /* For smaller screens, use 90% of the screen width */
     }
+
+    #main-body {
+        max-width: 90%;
+        /* For smaller screens, use 90% of the screen width */
+    }
 }
 
 #main-body {
-    border-radius: 5%;
+    border-radius: 25px;
     padding-left: 2%;
     padding-right: 2%;
     margin-top: 2%;
