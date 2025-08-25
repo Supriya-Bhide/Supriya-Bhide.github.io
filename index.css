@@ -109,3 +109,86 @@ mark {
     box-shadow: 1px 1px 25px #d8d8d8;
 
 }
+
+/* Page2 rotating gallery */
+.gallery-container {
+  perspective: 1000px; /* Establishes the 3D perspective */
+  width: 300px;
+  height: 300px;
+  position: relative;
+  margin: 150px auto;
+}
+
+.gallery-octagon {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  transform-style: preserve-3d; /* Key for 3D transforms */
+  transition: transform 0.8s ease-in-out; /* Smooth rotation transition */
+}
+
+/* .face {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid #ccc;
+} */
+
+.face {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid #ccc;
+  backface-visibility: hidden;
+}
+
+/* Positioning and rotating each face
+.front { transform: rotateY(0deg) translateZ(150px); background-image: url('images/image1.png'); }
+.back { transform: rotateY(180deg) translateZ(150px); background-image: url('images/image2.png'); }
+.left { transform: rotateY(-90deg) translateZ(150px); background-image: url('images/image3.png'); }
+.right { transform: rotateY(90deg) translateZ(150px); background-image: url('images/sq_profile.jpg'); }
+.top { transform: rotateX(90deg) translateZ(150px); background-image: url('images/image4.jpeg'); }
+.bottom { transform: rotateX(-90deg) translateZ(150px); background-image: url('images/sq_profile.jpg'); } */
+
+/* Positioning and rotating each face
+.face1 { transform: rotateY(0deg) translateZ(150px); background-image: url('images/image1.png'); }
+.face2 { transform: rotateY(45deg) translateZ(150px); background-image: url('images/image2.png'); }
+.face3 { transform: rotateY(90deg) translateZ(150px); background-image: url('images/image3.png'); }
+.face4 { transform: rotateY(135deg) translateZ(150px); background-image: url('images/image3.png'); }
+.face5 { transform: rotateY(180deg) translateZ(150px); background-image: url('images/image3.png'); }
+.face6 { transform: rotateY(225deg) translateZ(150px); background-image: url('images/sq_profile.jpg'); }
+.face7 { transform: rotateY(270deg) translateZ(150px); background-image: url('images/sq_profile.jpg'); }
+.face8 { transform: rotateY(315deg) translateZ(150px); background-image: url('images/sq_profile.jpg'); } */
+/* .top { transform: rotateX(90deg) translateZ(150px); background-image: url('images/image4.jpeg'); }
+.bottom { transform: rotateX(-90deg) translateZ(150px); background-image: url('images/sq_profile.jpg'); } */
+
+/* Use correct spacing: rotateY(i * 45deg) */
+.face1 { transform: rotateY(0deg) translateZ(362px); background-image: url('images/number_1.png'); }
+.face2 { transform: rotateY(45deg) translateZ(362px); background-image: url('images/number_2.png'); }
+.face3 { transform: rotateY(90deg) translateZ(362px); background-image: url('images/number_3.png'); }
+.face4 { transform: rotateY(135deg) translateZ(362px); background-image: url('images/number_4.png'); }
+.face5 { transform: rotateY(180deg) translateZ(362px); background-image: url('images/number_5.png'); }
+.face6 { transform: rotateY(225deg) translateZ(362px); background-image: url('images/number_6.png'); }
+.face7 { transform: rotateY(270deg) translateZ(362px); background-image: url('images/number_7.png'); }
+.face8 { transform: rotateY(315deg) translateZ(362px); background-image: url('images/number_8.png'); }
+
+
+.nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 10px 15px;
+  background-color: #333;
+  color: white;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.prev { left: -60px; }
+.next { right: -60px; }
+.brownCat { top: -60px; }
