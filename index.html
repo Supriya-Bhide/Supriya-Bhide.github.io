@@ -64,6 +64,14 @@ include Teal color(possibly a white-black-teal combo)
             constantly seeking new knowledge and perspectives.
         </div>
         <br />
+        <div id="updates-container"></div>
+        <script>
+        fetch("work-updates.html")
+            .then(response => response.text())
+            .then(html => {
+            document.getElementById("updates-container").innerHTML = html;
+            });
+        </script>
     </div>
 </body>
 

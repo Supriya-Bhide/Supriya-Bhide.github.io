@@ -28,7 +28,7 @@ h1 {
 
 a:link,
 a:visited {
-    color: #ffffff;
+    color: teal;
 }
 
 /* a:visited{
@@ -108,4 +108,11 @@ mark {
     /* Automatically centers horizontally */
     box-shadow: 1px 1px 25px #d8d8d8;
 
+}
+.subject-title{
+    font-style: italic;
+}
+
+#updates-container{
+    text-align: left !important;
 }
