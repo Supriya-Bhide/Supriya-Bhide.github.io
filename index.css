@@ -256,6 +256,6 @@ mark {
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -1;   */     /* Put behind all content */
+    z-index: -1;      /* Put behind all content */
     display: block;     /* Removes default inline spacing  */
     }
