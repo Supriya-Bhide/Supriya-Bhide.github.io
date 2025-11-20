@@ -25,7 +25,7 @@ include Teal color(possibly a white-black-teal combo)
     <canvas id="outerspace"></canvas>
     <div align="center" id="myname"><b>
             <br />
-            <font size="+3.7">Supriya Bhide</font>
+            <font size="+3.7" style="color: white;">Supriya Bhide</font>
         </b><br>
     </div>
     <div class="container" align="center" id="main-body">
@@ -99,11 +99,22 @@ include Teal color(possibly a white-black-teal combo)
         let outerspace = document.querySelector("#outerspace");
         let mainContext = outerspace.getContext('2d');
 
-        let canvasWidth = outerspace.width;
-        let canvasHeight = outerspace.height;
+        let canvasWidth, canvasHeight, centerX, centerY;
 
-        let centerX = canvasWidth * 0.5;
-        let centerY = canvasHeight * 0.5;
+        function resizeCanvas() {
+            outerspace.width = window.innerWidth;
+            outerspace.height = window.innerHeight;
+
+            canvasWidth = outerspace.width;
+            canvasHeight = outerspace.height;
+
+            centerX = canvasWidth * 0.5;
+            centerY = canvasHeight * 0.5;
+        }
+
+        // Call once at the start and add listener
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
 
         let numberOfStars = 500;
 
