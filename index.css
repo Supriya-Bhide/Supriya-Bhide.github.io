@@ -249,4 +249,11 @@ mark {
       border: 1px solid #111;
       border-radius: 10px;
       filter: drop-shadow(0px 0px 10px #333);
+      position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;        /* Put behind all content */
+    display: block;     /* Removes default inline spacing */
     }
