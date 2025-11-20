@@ -1,6 +1,50 @@
 @font-face {
     font-family: "CanvaSans";
-    src: url("./usr/share/fonts/OnlineWebFonts_COM_5f2c1fb3cc2f6e9776878fef70759e96/Centra No1 TRIAL/usr/share/fonts/OnlineWebFonts_COM_5f2c1fb3cc2f6e9776878fef70759e96/Centra No1 TRIAL.ttf");
+    src: url("Fonts/CanvaSans/CanvaSans-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "CanvaSans";
+    src: url("Fonts/CanvaSans/CanvaSans-Bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+/* Regular */
+@font-face {
+    font-family: "Kollektif";
+    src: url("Fonts/kollektif/Kollektif.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Bold */
+@font-face {
+    font-family: "Kollektif";
+    src: url("Fonts/kollektif/Kollektif-Bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* Italic */
+@font-face {
+    font-family: "Kollektif";
+    src: url("Fonts/kollektif/Kollektif-Italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}
+
+/* Bold Italic */
+@font-face {
+    font-family: "Kollektif";
+    src: url("Fonts/kollektif/Kollektif-BoldItalic.ttf") format("truetype");
+    font-weight: bold;
+    font-style: italic;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 img {
@@ -16,6 +60,12 @@ img {
 
 body {
     background-color: rgba(244, 242, 242, 0.785);
+    /* background-image: url(images/mountains1.jpg); */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* body stays fixed */
+    margin: 0;
+    padding: 0;
 }
 
 h1 {
@@ -28,7 +78,7 @@ h1 {
 
 a:link,
 a:visited {
-    color: #ffffff;
+    color: teal;
 }
 
 /* a:visited{
@@ -63,10 +113,24 @@ mark {
     background-color: black;
     color: wheat;
 }
-
+#construction {
+    font-family: "Kollektif";
+    /* font-style: italic; */
+    font-weight: normal;
+    background: black;
+    color: white;
+    font-weight: bold;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-size: 1rem;
+    display: inline-block;    /* prevents full-width */
+    text-align: center;
+    margin-top: 10px;
+}
 #about {
     font-family: "CanvaSans", sans-serif;
     text-align: justify;
+    font-weight: normal;
     border-radius: 25px;
     padding-left: 2%;
     padding-right: 2%;
@@ -80,6 +144,25 @@ mark {
     margin-left: auto;
     margin-right: auto;
     /* Automatically centers horizontally */
+}
+
+#myname {
+    font-family: "CanvaSans", sans-serif;
+    text-align: center;
+    font-weight: normal;
+    border-radius: 25px;
+    padding-left: 2%;
+    padding-right: 2%;
+    padding-bottom: 2%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+/*     background-color: rgb(243, 238, 234); */
+    color: black;
+    max-width: 100%;
+    /* Max width ensures it's responsive */
+    margin-left: auto;
+    margin-right: auto;
+    /* Automatically centers horizontally */    
 }
 
 @media (max-width: 768px) {
@@ -109,3 +192,68 @@ mark {
     box-shadow: 1px 1px 25px #d8d8d8;
 
 }
+.subject-title{
+    font-style: italic;
+}
+
+#updates-container{
+    text-align: left !important;
+    font-family: CanvaSans;
+}
+
+.update-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    /* font-family: Kollektif; */
+}
+
+.update-item .update-title {
+    flex: 1;
+    font-family: Kollektif;
+}
+
+.update-talks {
+    /* display: flex; */
+    justify-content: space-between;
+    /* align-items: center; */
+    padding: 4px 0;
+}
+
+.update-talks .authors {
+    flex: 1;
+    font-family: CanvaSans;
+}
+.update-talks .subject-title {
+    flex: 1;
+    font-family: Kollektif;
+}
+.update-talks .where {
+    /* white-space: nowrap; */
+    margin-left: 1rem;
+    font-family: CanvaSans;
+}
+.update-item .badge-winner {
+    background: gold;
+    color: black;
+    font-weight: bold;
+    padding: 1px 5px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    margin-right: 6px;
+}
+
+/* Space Background */
+#outerspace {
+      border: 1px solid #111;
+      border-radius: 10px;
+      filter: drop-shadow(0px 0px 10px #333);
+      position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;        /* Put behind all content */
+    display: block;     /* Removes default inline spacing */
+    }
