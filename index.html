@@ -99,6 +99,11 @@ include Teal color(possibly a white-black-teal combo)
         let outerspace = document.querySelector("#outerspace");
         let mainContext = outerspace.getContext('2d');
 
+         /* --- Mobile tuning --- */
+    const isMobile = window.innerWidth <= 768;
+    const SPEED_MULTIPLIER = isMobile ? 0.4 : 1;
+    let numberOfStars = isMobile ? 150 : 500;
+    
         let canvasWidth, canvasHeight, centerX, centerY;
 
         function resizeCanvas() {
@@ -116,7 +121,7 @@ include Teal color(possibly a white-black-teal combo)
         resizeCanvas();
         window.addEventListener("resize", resizeCanvas);
 
-        let numberOfStars = 500;
+        // let numberOfStars = 500;
 
         let stars = [];
 
@@ -136,13 +141,13 @@ include Teal color(possibly a white-black-teal combo)
                 this.counter = getRandomInt(1, canvasWidth);
 
                 this.radiusMax = 1 + Math.random() * 10;
-                this.speed = getRandomInt(1, 5);
+                this.speed = isMobile ? getRandomInt(1, 2) : getRandomInt(1, 5);
 
                 this.context = mainContext;
             }
 
             drawStar() {
-                this.counter -= this.speed;
+                this.counter -= this.speed * SPEED_MULTIPLIER;
 
                 if (this.counter < 1) {
                     this.counter = canvasWidth;
