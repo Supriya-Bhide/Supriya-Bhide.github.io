@@ -76,7 +76,9 @@ h1 {
     color: rgb(188, 165, 19);
 }
 
-a:link,
+a:link{
+    color: #111;
+}
 a:visited {
     color: teal;
 }
@@ -86,7 +88,7 @@ a:visited {
 } */
 a:hover,
 a:active {
-    color: teal;
+    color: blueviolet;
 }
 
 a.one:visited {
