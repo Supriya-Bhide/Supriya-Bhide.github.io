@@ -12,11 +12,11 @@ include Teal color(possibly a white-black-teal combo)
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-YL6MT2705S"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-    gtag('config', 'G-YL6MT2705S');
+        gtag('config', 'G-YL6MT2705S');
     </script>
 
     <meta charset="UTF-8">
@@ -40,13 +40,7 @@ include Teal color(possibly a white-black-teal combo)
         </b><br>
     </div>
     <div class="container" align="center" id="main-body">
-        <div class="social" align="center">
-            <br>
-            <a href="https://github.com/Supriya-Bhide"><i class="fab fa-github" id="git"></i></a>
-            <a href="https://www.linkedin.com/in/supriyabhide/"><i class="fab fa-linkedin-in" id="linkedin"></i></a>
-            <a href="mailto:supriyabhide@cse.iitb.ac.in"><i class="fa fa-envelope" id="envelope"></i></a>
-        </div>
-        <br><br>
+
         <div align="center">
             <img id="imgMe" src="images/profile.jpg" width="200" alt="Avatar" draggable="false"
                 oncontextmenu="return false;" script />
@@ -55,6 +49,13 @@ include Teal color(possibly a white-black-teal combo)
             <font><i>Research Scholar, CSE, IIT Bombay</i></font>
             </br>
             <font><i>TCS Research Fellow</i></font>
+        </div>
+        <br><br>
+        <div class="social" align="center">
+            <br>
+            <a href="https://github.com/Supriya-Bhide"><i class="fab fa-github" id="git"></i></a>
+            <a href="https://www.linkedin.com/in/supriyabhide/"><i class="fab fa-linkedin-in" id="linkedin"></i></a>
+            <a href="mailto:supriyabhide@cse.iitb.ac.in"><i class="fa fa-envelope" id="envelope"></i></a>
         </div>
         <!-- <br /> <br /> <br /> <br />
         <div id="construction">
@@ -110,11 +111,11 @@ include Teal color(possibly a white-black-teal combo)
         let outerspace = document.querySelector("#outerspace");
         let mainContext = outerspace.getContext('2d');
 
-         /* --- Mobile tuning --- */
-    const isMobile = window.innerWidth <= 768;
-    const SPEED_MULTIPLIER = isMobile ? 0.4 : 1;
-    let numberOfStars = isMobile ? 150 : 500;
-    
+        /* --- Mobile tuning --- */
+        const isMobile = window.innerWidth <= 768;
+        const SPEED_MULTIPLIER = isMobile ? 0.4 : 1;
+        let numberOfStars = isMobile ? 150 : 500;
+
         let canvasWidth, canvasHeight, centerX, centerY;
 
         function resizeCanvas() {
