@@ -11,7 +11,6 @@
     font-weight: bold;
     font-style: normal;
 }
-
 /* Regular */
 @font-face {
     font-family: "Kollektif";
@@ -45,7 +44,7 @@
 }
 
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 img {
@@ -64,8 +63,7 @@ body {
     /* background-image: url(images/mountains1.jpg); */
     background-size: cover;
     background-repeat: no-repeat;
-    background-attachment: fixed;
-    /* body stays fixed */
+    background-attachment: fixed; /* body stays fixed */
     margin: 0;
     padding: 0;
 }
@@ -78,16 +76,15 @@ h1 {
     color: rgb(188, 165, 19);
 }
 
-a:link {
+a:link{
     font-family: "CanvaSans", sans-serif;
     text-align: justify;
     font-weight: normal;
     border-radius: 25px;
-    text-decoration: none;
-    color: teal;
-
+    text-decoration:none;
+    color: #111;
+    
 }
-
 a:visited {
     color: teal;
 }
@@ -124,7 +121,6 @@ mark {
     background-color: black;
     color: wheat;
 }
-
 #construction {
     font-family: "Kollektif";
     /* font-style: italic; */
@@ -135,12 +131,10 @@ mark {
     padding: 4px 6px;
     border-radius: 6px;
     font-size: 1rem;
-    display: inline-block;
-    /* prevents full-width */
+    display: inline-block;    /* prevents full-width */
     text-align: center;
     margin-top: 10px;
 }
-
 #about {
     font-family: "CanvaSans", sans-serif;
     text-align: justify;
@@ -151,7 +145,7 @@ mark {
     padding-bottom: 2%;
     margin-top: 2%;
     margin-bottom: 2%;
-    /*     background-color: rgb(243, 238, 234); */
+/*     background-color: rgb(243, 238, 234); */
     color: black;
     max-width: 100%;
     /* Max width ensures it's responsive */
@@ -170,13 +164,13 @@ mark {
     padding-bottom: 2%;
     margin-top: 2%;
     margin-bottom: 2%;
-    /*     background-color: rgb(243, 238, 234); */
+/*     background-color: rgb(243, 238, 234); */
     color: black;
     max-width: 100%;
     /* Max width ensures it's responsive */
     margin-left: auto;
     margin-right: auto;
-    /* Automatically centers horizontally */
+    /* Automatically centers horizontally */    
 }
 
 @media (max-width: 768px) {
@@ -206,12 +200,11 @@ mark {
     box-shadow: 1px 1px 25px #d8d8d8;
 
 }
-
-.subject-title {
+.subject-title{
     font-style: italic;
 }
 
-#updates-container {
+#updates-container{
     text-align: left !important;
     font-family: CanvaSans;
 }
@@ -240,18 +233,15 @@ mark {
     flex: 1;
     font-family: CanvaSans;
 }
-
 .update-talks .subject-title {
     flex: 1;
     font-family: Kollektif;
 }
-
 .update-talks .where {
     /* white-space: nowrap; */
     margin-left: 1rem;
     font-family: CanvaSans;
 }
-
 .update-item .badge-winner {
     background: gold;
     color: black;
@@ -272,8 +262,6 @@ mark {
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -1;
-    /* Put behind all content */
-    display: block;
-    /* Removes default inline spacing  */
-}
+    z-index: -1;      /* Put behind all content */
+    display: block;     /* Removes default inline spacing  */
+    }
