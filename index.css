@@ -224,6 +224,11 @@ mark {
     font-family: CanvaSans;
 }
 
+#tools-container{
+    text-align: left !important;
+    font-family: CanvaSans;
+}
+
 .update-item {
     display: flex;
     justify-content: space-between;
