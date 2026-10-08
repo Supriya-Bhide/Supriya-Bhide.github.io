@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DOT explorer</title>
+<script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+<!-- Graphviz compiled to WebAssembly: real "dot" layout in the browser -->
+<script src="https://cdn.jsdelivr.net/npm/@hpcc-js/wasm@2.16.2/dist/graphviz.umd.js"></script>
+<style>
+  :root {
+    --ink: #1f3a5f; --ink-soft: #5b6f88; --paper: #f6f8fb; --line: #d5dde8;
+    --fold: #e8a33d; --fold-ink: #4a2f05; --focus: #2b7a78; --panel: #ffffff;
+    font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--paper); color: var(--ink); }
+  body { display: grid; grid-template-rows: auto 1fr; }
+  header { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 12px;
+           border-bottom: 1px solid var(--line); background: var(--panel); }
+  header h1 { font-size: 15px; margin: 0 12px 0 0; font-weight: 600; }
+  button, input, select { font: inherit; font-size: 13px; }
+  button { border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+           padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+  button:hover { border-color: var(--ink-soft); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  input[type=search] { border: 1px solid var(--line); padding: 5px 8px; border-radius: 4px; width: 200px; }
+  label.chk { font-size: 13px; display: flex; gap: 4px; align-items: center; }
+  .stat { font-size: 12px; color: var(--ink-soft); margin-left: auto; }
+  main { display: grid; grid-template-columns: 1fr 280px; min-height: 0; }
+  #net { min-height: 0; }
+  aside { border-left: 1px solid var(--line); background: var(--panel); padding: 12px;
+          overflow: auto; font-size: 13px; line-height: 1.45; }
+  aside h2 { font-size: 14px; margin: 0 0 6px; word-break: break-all; }
+  aside h3 { font-size: 12px; color: var(--ink-soft); font-weight: 600; margin: 14px 0 4px; }
+  aside ul { list-style: none; margin: 0; padding: 0; }
+  aside li a { color: var(--ink); cursor: pointer; text-decoration: underline;
+               text-decoration-color: var(--line); word-break: break-all; }
+  aside li a.hid { color: var(--ink-soft); font-style: italic; }
+  .crumbs { font-size: 12px; color: var(--ink-soft); margin-bottom: 10px; }
+  .help { color: var(--ink-soft); }
+  .help b { color: var(--ink); font-weight: 600; }
+  #loader { position: fixed; inset: 0; background: var(--paper); display: none;
+            place-items: center; padding: 20px; z-index: 5; }
+  #loader .box { width: min(720px, 100%); }
+  #loader textarea { width: 100%; height: 300px; font-family: ui-monospace, Consolas, monospace;
+                     font-size: 12px; border: 1px solid var(--line); border-radius: 4px; padding: 8px; }
+  #loader .row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+  #err { color: #b3261e; font-size: 13px; }
+  @media (max-width: 760px) { main { grid-template-columns: 1fr; grid-template-rows: 1fr 200px; }
+                              aside { border-left: 0; border-top: 1px solid var(--line); } }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">DOT explorer</h1>
+  <input type="search" id="search" list="names" placeholder="Find node…">
+  <datalist id="names"></datalist>
+  <button id="back" title="Previous focus">Back</button>
+  <button id="unfocus">Show whole graph</button>
+  <button id="expandAll">Expand all</button>
+  <button id="collapseAll">Collapse to roots</button>
+  <button id="fit">Fit</button>
+  <label class="chk"><input type="checkbox" id="free"> Free layout (physics)</label>
+  <button id="loadNew">Load other .dot</button>
+  <span class="stat" id="stat"></span>
+</header>
+<main>
+  <div id="net"></div>
+  <aside id="side">
+    <div class="crumbs" id="crumbs"></div>
+    <div id="details"></div>
+    <div class="help" id="help">
+      <p><b>Click</b> a node to collapse or expand its successors. Collapsed nodes are amber and show how many nodes they hide.</p>
+      <p><b>Double-click</b> a node to focus on it: only nodes reachable from it are shown.</p>
+      <p>Loops are safe: a collapse hides only nodes you can no longer reach without passing through that node.</p>
+    </div>
+  </aside>
+</main>
+
+<div id="loader">
+  <div class="box">
+    <h2 style="margin:0 0 8px;font-size:18px">Open a Graphviz .dot file</h2>
+    <div class="row"><input type="file" id="file" accept=".dot,.gv,.txt"></div>
+    <p class="help" style="margin:10px 0 4px">…or paste DOT text:</p>
+    <textarea id="dotText" placeholder="digraph G { a -> b; b -> c; c -> a; }"></textarea>
+    <div class="row"><button id="render">Show graph</button><button id="cancelLoad">Cancel</button><span id="err"></span></div>
+  </div>
+</div>
+
+<script>
+const PAYLOAD = null;
+const CONFIG = {"depth": -1, "root": "", "title": "DOT explorer"};
+
+const C = { ink: "#1f3a5f", soft: "#333333", line: "#222222", fold: "#e8a33d", foldInk: "#4a2f05",
+            focus: "#e8a33d", node: "#007b7b", nodeText: "#ffffff" };
+
+let G = null;            // {ids, label, attrs, out:Map, inn:Map, edges:[]}
+let network, nodesDS, edgesDS;
+let collapsed = new Set();
+let focusStack = [];     // stack of focused node ids
+let coverRoots = [];
+let selected = null;
+
+/* ---------- graph model ---------- */
+function buildModel(nodes, edges, directed) {
+  const g = { ids: [], label: new Map(), attrs: new Map(), out: new Map(), inn: new Map(), edges: [] };
+  const add = (id, label, attrs) => {
+    if (!g.label.has(id)) { g.ids.push(id); g.out.set(id, []); g.inn.set(id, []); }
+    if (label !== undefined || !g.label.has(id)) g.label.set(id, label ?? id);
+    if (attrs) g.attrs.set(id, attrs);
+  };
+  nodes.forEach(n => add(String(n.id), n.label != null ? String(n.label) : String(n.id), n.attrs || {}));
+  edges.forEach((e, i) => {
+    const f = String(e.from), t = String(e.to);
+    if (!g.label.has(f)) add(f); if (!g.label.has(t)) add(t);
+    const id = "e" + i;
+    g.edges.push({ id, from: f, to: t, label: e.label || "", mirror: !!e.mirror });
+    g.out.get(f).push(t); g.inn.get(t).push(f);
+  });
+  for (const id of g.ids) { g.out.set(id, [...new Set(g.out.get(id))]); g.inn.set(id, [...new Set(g.inn.get(id))]); }
+  return g;
+}
+
+// Roots that reach every node: in-degree-0 nodes first, then cover leftover cycles
+function computeCoverRoots() {
+  const seen = new Set(), roots = [];
+  const bfs = r => { const q = [r]; seen.add(r); while (q.length) { const u = q.shift();
+    for (const v of G.out.get(u)) if (!seen.has(v)) { seen.add(v); q.push(v); } } };
+  for (const id of G.ids) if (G.inn.get(id).length === 0) { roots.push(id); bfs(id); }
+  const rest = G.ids.filter(id => !seen.has(id)).sort((a, b) => G.out.get(b).length - G.out.get(a).length);
+  for (const id of rest) if (!seen.has(id)) { roots.push(id); bfs(id); }
+  return roots;
+}
+
+const currentRoots = () => focusStack.length ? [focusStack[focusStack.length - 1]] : coverRoots;
+
+// Visible = reachable from the roots without traversing out of a collapsed node
+function computeVisible() {
+  const vis = new Set(), q = [];
+  for (const r of currentRoots()) if (!vis.has(r)) { vis.add(r); q.push(r); }
+  while (q.length) {
+    const u = q.shift();
+    if (collapsed.has(u)) continue;
+    for (const v of G.out.get(u)) if (!vis.has(v)) { vis.add(v); q.push(v); }
+  }
+  return vis;
+}
+
+function hiddenBelow(u, vis) {      // nodes reachable from u (full graph) that are currently hidden
+  const seen = new Set([u]), q = [u]; let n = 0;
+  while (q.length) { const x = q.shift();
+    for (const v of G.out.get(x)) if (!seen.has(v)) { seen.add(v); q.push(v); if (!vis.has(v)) n++; } }
+  return n;
+}
+
+/* ---------- rendering ---------- */
+function nodeLabel(id, vis) {
+  let label = G.label.get(id);
+  if (collapsed.has(id) && G.out.get(id).length) {
+    const hid = hiddenBelow(id, vis);
+    label += hid ? `\n+${hid}` : "\n(collapsed)";
+  }
+  return label;
+}
+
+function nodeStyle(id, vis) {
+  const isRoot = currentRoots().includes(id) && focusStack.length;
+  const folded = collapsed.has(id) && G.out.get(id).length;
+  const a = G.attrs.get(id) || {};
+  const fill = a.fillcolor || C.node, txt = a.fontcolor || C.nodeText;
+  return {
+    id, label: nodeLabel(id, vis), hidden: !vis.has(id),
+    shape: "box", margin: { top: 6, bottom: 6, left: 10, right: 10 },
+    shapeProperties: { borderRadius: 8 }, borderWidth: isRoot ? 3 : 1,
+    physics: $("free").checked,
+    color: folded
+      ? { background: C.fold, border: C.foldInk, highlight: { background: "#f2bd6a", border: C.foldInk } }
+      : { background: fill, border: isRoot ? C.focus : "#003f3f", highlight: { background: "#0a9a9a", border: "#002b2b" } },
+    font: { color: folded ? C.foldInk : txt, face: "DejaVu Sans, Verdana, sans-serif", size: 14, multi: false },
+    title: id + (G.out.get(id).length ? `\n${G.out.get(id).length} successor(s)` : "\nno successors"),
+  };
+}
+
+/* ---------- Graphviz layout of the visible part ---------- */
+let gv = null, layoutSeq = 0;
+const gvReady = (async () => {
+  try { gv = await window["@hpcc-js/wasm"].Graphviz.load(); } catch (e) { console.warn("Graphviz wasm unavailable", e); }
+})();
+function plainTokens(line) {
+  const out = [], re = /"((?:[^"\\]|\\.)*)"|(\S+)/g; let m;
+  while ((m = re.exec(line))) out.push(m[1] !== undefined ? m[1] : m[2]);
+  return out;
+}
+async function relayout(fit) {
+  const seq = ++layoutSeq;
+  await gvReady;
+  if (seq !== layoutSeq || $("free").checked) return;
+  const vis = computeVisible();
+  if (!gv) {   // fallback: vis-network's own layered layout
+    network.setOptions({ physics: { enabled: false }, layout: { hierarchical: { enabled: true, direction: "UD",
+      sortMethod: "directed", shakeTowards: "roots", levelSeparation: 110, nodeSpacing: 150 } } });
+    if (fit) network.fit(); return;
+  }
+  const ids = G.ids.filter(i => vis.has(i));
+  const key = new Map(ids.map((id, i) => [id, "n" + i]));
+  const q = t => '"' + String(t).replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n") + '"';
+  let src = 'digraph{rankdir=TB;nodesep=0.35;ranksep=0.55;' +
+    'node[shape=box,fontname="Helvetica",fontsize=14,margin="0.15,0.07"];edge[fontsize=12];\n';
+  for (const id of ids) src += `${key.get(id)}[label=${q(nodeLabel(id, vis))}];\n`;
+  const shown = G.edges.filter(e => !e.mirror && vis.has(e.from) && vis.has(e.to));
+  for (const e of shown) src += `${key.get(e.from)}->${key.get(e.to)}${e.label ? `[label=${q(e.label)}]` : ""};\n`;
+  src += "}";
+  let plain;
+  try { plain = gv.layout(src, "plain", "dot"); } catch (e) { console.warn(e); return; }
+  if (seq !== layoutSeq) return;
+  const back = new Map([...key].map(([id, k]) => [k, id])), pos = new Map();
+  for (const line of plain.split("\n")) {
+    const t = plainTokens(line);
+    if (t[0] === "node") pos.set(back.get(t[1]), { x: +t[2] * 90, y: -t[3] * 90 });
+  }
+  network.setOptions({ physics: { enabled: false }, layout: { hierarchical: { enabled: false } } });
+  nodesDS.update([...pos].map(([id, p]) => ({ id, x: p.x, y: p.y })));
+  // straight-ish downward edges, curved back edges (cycles) so they don't overlap
+  edgesDS.update(shown.map(e => {
+    const a = pos.get(e.from), b = pos.get(e.to);
+    const up = a && b && b.y < a.y - 1;
+    return { id: e.id, smooth: up ? { enabled: true, type: "curvedCW", roundness: 0.2 }
+                                   : { enabled: true, type: "cubicBezier", forceDirection: "vertical", roundness: 0.35 } };
+  }));
+  if (fit) network.fit({ animation: { duration: 400 } });
+}
+
+function render(keepView = true) {
+  const vis = computeVisible();
+  nodesDS.update(G.ids.map(id => nodeStyle(id, vis)));
+  edgesDS.update(G.edges.filter(e => !e.mirror).map(e => ({ id: e.id, hidden: !(vis.has(e.from) && vis.has(e.to)) })));
+  document.getElementById("stat").textContent = `${vis.size} of ${G.ids.length} nodes shown`;
+  renderCrumbs(); renderDetails();
+  if (!$("free").checked) relayout(!keepView);
+  else if (!keepView) setTimeout(() => network.fit({ animation: { duration: 400 } }), 50);
+}
+
+function renderCrumbs() {
+  const el = document.getElementById("crumbs");
+  el.textContent = focusStack.length ? "Focus: " + focusStack.map(id => G.label.get(id).split("\n")[0]).join(" › ")
+                                     : `Whole graph (${coverRoots.length} root${coverRoots.length === 1 ? "" : "s"})`;
+}
+
+function renderDetails() {
+  const box = document.getElementById("details");
+  document.getElementById("help").style.display = selected ? "none" : "";
+  if (!selected) { box.innerHTML = ""; return; }
+  const vis = computeVisible();
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const list = ids => ids.length ? "<ul>" + ids.map(id =>
+      `<li><a data-id="${esc(id)}" class="${vis.has(id) ? "" : "hid"}">${esc(G.label.get(id).split("\n")[0])}</a></li>`).join("") + "</ul>"
+    : "<p class='help'>none</p>";
+  const attrs = G.attrs.get(selected) || {};
+  const attrHtml = Object.keys(attrs).length
+    ? "<ul>" + Object.entries(attrs).map(([k, v]) => `<li>${esc(k)} = ${esc(v)}</li>`).join("") + "</ul>" : "";
+  box.innerHTML = `<h2>${esc(G.label.get(selected))}</h2>
+    <div class="help">id: ${esc(selected)}</div>
+    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+      <button id="dFocus">Focus here</button>
+      <button id="dToggle">${collapsed.has(selected) ? "Expand" : "Collapse"}</button>
+      <button id="dExpandSub">Expand subtree</button>
+    </div>
+    <h3>Successors (${G.out.get(selected).length})</h3>${list(G.out.get(selected))}
+    <h3>Predecessors (${G.inn.get(selected).length})</h3>${list(G.inn.get(selected))}
+    ${attrHtml ? "<h3>Attributes</h3>" + attrHtml : ""}`;
+  box.querySelectorAll("a[data-id]").forEach(a => a.onclick = () => focusOn(a.dataset.id));
+  box.querySelector("#dFocus").onclick = () => focusOn(selected);
+  box.querySelector("#dToggle").onclick = () => toggle(selected);
+  box.querySelector("#dExpandSub").onclick = () => expandSubtree(selected);
+}
+
+/* ---------- actions ---------- */
+function toggle(id) {
+  if (!G.out.get(id).length) return;
+  collapsed.has(id) ? collapsed.delete(id) : collapsed.add(id);
+  render();
+}
+function expandSubtree(id) {
+  const seen = new Set([id]), q = [id];
+  while (q.length) { const u = q.shift(); collapsed.delete(u);
+    for (const v of G.out.get(u)) if (!seen.has(v)) { seen.add(v); q.push(v); } }
+  render();
+}
+function focusOn(id) {
+  if (!G.label.has(id)) return;
+  if (focusStack[focusStack.length - 1] !== id) focusStack.push(id);
+  collapsed.delete(id);
+  selected = id; render(false);
+  network.selectNodes([id]);
+}
+function collapseAtDepth(d) {
+  const depth = new Map(), q = [];
+  for (const r of currentRoots()) { depth.set(r, 0); q.push(r); }
+  while (q.length) { const u = q.shift(); const du = depth.get(u);
+    if (du >= d) { if (G.out.get(u).length) collapsed.add(u); continue; }
+    for (const v of G.out.get(u)) if (!depth.has(v)) { depth.set(v, du + 1); q.push(v); } }
+}
+
+/* ---------- setup ---------- */
+function start(model) {
+  G = model;
+  coverRoots = computeCoverRoots();
+  collapsed = new Set(); focusStack = []; selected = null;
+  document.getElementById("names").innerHTML =
+    G.ids.slice(0, 5000).map(id => `<option value="${id.replace(/"/g, "&quot;")}">`).join("");
+
+  if (CONFIG.root && G.label.has(CONFIG.root)) focusStack.push(CONFIG.root);
+  if (CONFIG.depth >= 0) collapseAtDepth(CONFIG.depth);
+  else if (G.ids.length > 300) collapseAtDepth(2);   // keep big graphs readable at start
+
+  nodesDS = new vis.DataSet(G.ids.map(id => ({ id })));
+  edgesDS = new vis.DataSet(G.edges.filter(e => !e.mirror).map(e => ({
+    id: e.id, from: e.from, to: e.to,
+    label: e.from === e.to ? undefined : (e.label || undefined),   // loop labels are drawn below
+    arrows: G.directed === false ? "" : {to:{ enabled: true, scaleFactor: 0.7, type: "arrow" } },
+    color: { color: C.line, highlight: C.fold }, width: 1,
+    font: { size: 20, color: C.soft, face: "Georgia, serif", strokeWidth: 0, align: "middle", background: "#fbe9ec"},
+    selfReference: { size: 10, angle: 0 },
+    smooth: { type: "cubicBezier", forceDirection: "vertical", roundness: 0.35 },
+  })));
+  if (network) network.destroy();
+  network = new vis.Network(document.getElementById("net"), { nodes: nodesDS, edges: edgesDS }, {
+    interaction: { hover: true, tooltipDelay: 200, doubleClick: true },
+    physics: { enabled: false, solver: "forceAtlas2Based", stabilization: { iterations: 200 },
+               forceAtlas2Based: { gravitationalConstant: -60, springLength: 120 } },
+    layout: { improvedLayout: G.ids.length < 400 },
+  });
+  // vis-network doesn't draw label backgrounds on self-loops, so draw those labels ourselves
+  const LOOP_BG = "#fbe9ec", LOOP_FONT = "20px Georgia, serif", LOOP_SIZE = 10;
+  network.on("afterDrawing", ctx => {
+    const shown = computeVisible();
+    ctx.font = LOOP_FONT; ctx.textBaseline = "middle"; ctx.textAlign = "left";
+    for (const e of G.edges) {
+      if (e.mirror || e.from !== e.to || !e.label || !shown.has(e.from)) continue;
+      const bb = network.getBoundingBox(e.from);
+      const x = bb.right + 2 * LOOP_SIZE + 1;          // just past the loop on the right
+      const y = (bb.top + bb.bottom) / 2;
+      const w = ctx.measureText(e.label).width, h = 24, pad = 4;
+      ctx.fillStyle = LOOP_BG;
+      ctx.fillRect(x - pad, y - h / 2, w + pad * 2, h);
+      ctx.fillStyle = C.soft;
+      ctx.fillText(e.label, x, y);
+    }
+  });
+  // single vs double click
+  let clickTimer = null;
+  network.on("click", p => {
+    if (!p.nodes.length) { selected = null; renderDetails(); return; }
+    const id = p.nodes[0]; selected = id;
+    clearTimeout(clickTimer);
+    clickTimer = setTimeout(() => toggle(id), 220);
+  });
+  network.on("doubleClick", p => { clearTimeout(clickTimer); if (p.nodes.length) focusOn(p.nodes[0]); });
+  render(false);
+}
+
+function applyLayout() {
+  if ($("free").checked) {
+    nodesDS.update(G.ids.map(id => ({ id, physics: true })));
+    network.setOptions({ layout: { hierarchical: { enabled: false } }, physics: { enabled: true, solver: "forceAtlas2Based" } });
+  } else {
+    nodesDS.update(G.ids.map(id => ({ id, physics: false })));
+    relayout(true);
+  }
+}
+
+function fromDotText(text) {
+  const parsed = vis.parseDOTNetwork(text);
+  const directed = /^\s*(strict\s+)?digraph/i.test(text.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, ""));
+  const edges = parsed.edges.map(e => ({ from: e.from, to: e.to, label: e.label }));
+  if (!directed) parsed.edges.forEach(e => edges.push({ from: e.to, to: e.from, mirror: true }));
+  const m = buildModel(parsed.nodes.map(n => ({ id: n.id, label: n.label, attrs: (n.color && n.color.background) ? { fillcolor: n.color.background } : {} })), edges, directed);
+  m.directed = directed; return m;
+}
+
+/* ---------- UI wiring ---------- */
+const $ = id => document.getElementById(id);
+$("back").onclick = () => { focusStack.pop(); render(false); };
+$("unfocus").onclick = () => { focusStack = []; render(false); };
+$("expandAll").onclick = () => { collapsed.clear(); render(false); };
+$("collapseAll").onclick = () => { collapsed.clear(); collapseAtDepth(0); render(false); };
+$("fit").onclick = () => network.fit({ animation: { duration: 400 } });
+$("free").onchange = () => applyLayout();
+$("search").addEventListener("change", e => {
+  const q = e.target.value.trim(); if (!q) return;
+  const id = G.label.has(q) ? q : G.ids.find(i => (i + " " + G.label.get(i)).toLowerCase().includes(q.toLowerCase()));
+  if (id) focusOn(id); else e.target.setCustomValidity("No match"), e.target.reportValidity(), e.target.setCustomValidity("");
+});
+$("loadNew").onclick = () => { $("loader").style.display = "grid"; };
+$("cancelLoad").onclick = () => { if (G) $("loader").style.display = "none"; };
+$("file").onchange = async e => { const f = e.target.files[0]; if (!f) return;
+  $("dotText").value = await f.text(); $("title").textContent = f.name; document.title = f.name; $("render").click(); };
+$("render").onclick = () => {
+  $("err").textContent = "";
+  try { start(fromDotText($("dotText").value)); $("loader").style.display = "none"; }
+  catch (err) { $("err").textContent = "Could not parse DOT: " + err.message +
+    ". Try installing pydot and using dot_explorer.py, which handles more DOT syntax."; }
+};
+
+if (!window.vis) {
+  document.body.innerHTML = "<p style='padding:20px'>vis-network failed to load from unpkg.com. " +
+    "Check your internet connection, or download vis-network.min.js and point the &lt;script&gt; tag at the local copy.</p>";
+} else if (!PAYLOAD) {
+  $("loader").style.display = "grid";
+} else if (PAYLOAD.kind === "parsed") {
+  const m = buildModel(PAYLOAD.graph.nodes, PAYLOAD.graph.edges, PAYLOAD.graph.directed);
+  m.directed = PAYLOAD.graph.directed; start(m);
+} else {
+  try { start(fromDotText(PAYLOAD.dot)); }
+  catch (err) { $("dotText").value = PAYLOAD.dot; $("loader").style.display = "grid";
+                $("err").textContent = "Could not parse DOT: " + err.message; }
+}
+</script>
+</body>
+</html>
